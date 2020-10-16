@@ -17,12 +17,11 @@ namespace ProjectileAsset
             switch (trajectory)
             {
                 case FlightTrajectory.Linear:
-                    return position + direction * speed * Time.deltaTime;
+                    return startPosition + direction * time * speed;
 
                 case FlightTrajectory.Perabolic:
                     float angle = Vector3.Angle(new Vector3(direction.x, 0, direction.z), direction);
                     angle = direction.y >= 0 ? angle : -angle;
-
 
                     return new Vector3(
                             x: startPosition.x + direction.x * time * speed,
@@ -36,32 +35,33 @@ namespace ProjectileAsset
 
         public static bool CheckCollision(Vector3 position, Vector3 nextPosition)
         {
-            
-
             return Physics.Linecast(position, nextPosition);
         }
 
-        public static PenetrationResult CheckPenetration(Vector3 start, Vector3 end, float penetration)
+        public static PenetrationResult[] GetPenetrations(Vector3[] points)
         {
-            var forward = Physics.RaycastAll(
-                origin: start,
-                direction: end - start,
-                maxDistance: Vector3.Distance(start, end));
+            var forward = 
+                Physics.RaycastAll(
+                origin: points[0],
+                direction: points[1] - points[0],
+                maxDistance: Vector3.Distance(points[0], points[1])).OrderBy(x => x.distance);
 
             var backward =
                 Physics.RaycastAll(
-                origin: end,
-                direction: start - end,
-                maxDistance: Vector3.Distance(start, end));
-
-            var thickness = Vector3.Distance(forward.First().point, backward.Last().point) * 100;
-
-            return new PenetrationResult(
-                passed: penetration >= thickness,
-                thickness: thickness,
-                collider: forward.First().collider,
-                entryPoint: forward.First().point,
-                exitPoint: backward.Last().point);
+                origin: points[1],
+                direction: points[0] - points[1],
+                maxDistance: Vector3.Distance(points[0], points[1])).OrderBy(x => x.distance).ToArray();
+            
+            return forward.Select((entry, i) =>
+            {
+                var exit = backward[backward.Length - 1 - i];
+                return new PenetrationResult(
+                    thickness: Vector3.Distance(entry.point, exit.point) * 1000,
+                    collider: entry.collider,
+                    entryPoint: entry.point,
+                    exitPoint: exit.point
+                );
+            }).ToArray();
         }
     }
 }

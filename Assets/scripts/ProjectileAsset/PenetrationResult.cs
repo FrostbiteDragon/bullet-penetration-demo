@@ -10,10 +10,6 @@ namespace ProjectileAsset
     public class PenetrationResult
     {
         /// <summary>
-        /// Returns true if the projectile sucssesfully penetrated the object
-        /// </summary>
-        public bool Passed { get; }
-        /// <summary>
         /// The thickness of the object penetrated
         /// </summary>
         public float Thickness { get; }
@@ -30,9 +26,8 @@ namespace ProjectileAsset
         /// </summary>
         public Vector3 ExitPoint { get; }
 
-        public PenetrationResult(bool passed, float thickness, Collider collider, Vector3 entryPoint, Vector3 exitPoint)
+        public PenetrationResult(float thickness, Collider collider, Vector3 entryPoint, Vector3 exitPoint)
         {
-            Passed = passed;
             Thickness = thickness;
             Collider = collider;
             EntryPoint = entryPoint;

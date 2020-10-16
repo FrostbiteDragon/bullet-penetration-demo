@@ -59,7 +59,7 @@ namespace ProjectileAsset
 
         private Vector3 startPosition;
         private float startTime;
-        void Start()
+        protected void Awake()
         {
             startPosition = transform.position;
             startTime = Time.time;
@@ -67,13 +67,21 @@ namespace ProjectileAsset
 
         protected void FixedUpdate()
         {
-            Debug.Log(Speed);
             var nextPosition = Projectile.CalculateTrajectory(Time.time - startTime + Time.fixedDeltaTime, startPosition, transform.position, transform.forward, FlightTrajectory, Speed);
             if (Projectile.CheckCollision(transform.position, nextPosition))
                 if (PenetrationEnabled)
                 {
-                    var result = Projectile.CheckPenetration(transform.position, nextPosition, Penetration);
-                    Debug.Log($"{result.Thickness} cm");  
+                    var results = Projectile.GetPenetrations(new Vector3[] { transform.position, nextPosition });
+                    foreach (var result in results)
+                    {
+                        if (result.Thickness <= Penetration)
+                        {
+                            OnPenetrationEnter(result.EntryPoint, Vector3.zero);
+                            OnPenetrationExit(result.ExitPoint, Vector3.zero);
+                        }
+                        else
+                            Destroy(gameObject);
+                    }
                 }
 
             transform.position = nextPosition;
