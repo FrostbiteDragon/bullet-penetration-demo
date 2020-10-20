@@ -4,7 +4,7 @@ using ProjectileAsset;
 public class TestImplementation : ProjectileController
 {
     public GameObject bulletmarkPrefab;
-    public Color color;
+    private Color color;
 
     private void Start()
     {

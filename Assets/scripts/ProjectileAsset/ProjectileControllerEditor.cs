@@ -8,14 +8,14 @@ namespace ProjectileAsset
     public class ProjectileControllerEditor : Editor
     {
         SerializedProperty speed;
-        SerializedProperty flightTrajectory;
+        SerializedProperty gravityMultiplier;
         SerializedProperty penetrationEnabled;
         SerializedProperty penetration;
 
         public void OnEnable()
         {
             speed = serializedObject.FindProperty("_speed");
-            flightTrajectory = serializedObject.FindProperty("_flightTrajectory");
+            gravityMultiplier = serializedObject.FindProperty("_gravityMultiplier");
             penetrationEnabled = serializedObject.FindProperty("_penetrationEnabled");
             penetration = serializedObject.FindProperty("_penetration");
 
@@ -29,7 +29,7 @@ namespace ProjectileAsset
             serializedObject.Update();
 
             EditorGUILayout.PropertyField(speed);
-            EditorGUILayout.PropertyField(flightTrajectory);
+            EditorGUILayout.PropertyField(gravityMultiplier);
             EditorGUILayout.Space();
 
             EditorGUILayout.BeginHorizontal();

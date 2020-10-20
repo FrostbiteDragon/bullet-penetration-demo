@@ -12,25 +12,16 @@ namespace ProjectileAsset
 
     public static class Projectile
     {
-        public static Vector3 CalculateTrajectory(float time, Vector3 startPosition, Vector3 position, Vector3 direction, FlightTrajectory trajectory, float speed)
+        public static Vector3 CalculateTrajectory(float time, Vector3 startPosition, Vector3 direction, float gravityMultiplier, float speed)
         {
-            switch (trajectory)
-            {
-                case FlightTrajectory.Linear:
-                    return startPosition + direction * time * speed;
+            float angle = Vector3.Angle(new Vector3(direction.x, 0, direction.z), direction);
+            angle = direction.y >= 0 ? angle : -angle;
 
-                case FlightTrajectory.Perabolic:
-                    float angle = Vector3.Angle(new Vector3(direction.x, 0, direction.z), direction);
-                    angle = direction.y >= 0 ? angle : -angle;
-
-                    return new Vector3(
-                            x: startPosition.x + direction.x * time * speed,
-                            y: speed * time * Mathf.Sin(angle * Mathf.Deg2Rad) - 4.9f * Mathf.Pow(time, 2) + startPosition.y,
-                            z: startPosition.z + direction.z * time * speed
-                        );
-
-                default: return position;
-            }
+            return new Vector3(
+                    x: startPosition.x + direction.x * time * speed,
+                    y: speed * time * Mathf.Sin(angle * Mathf.Deg2Rad) - (4.9f * gravityMultiplier) * Mathf.Pow(time, 2) + startPosition.y,
+                    z: startPosition.z + direction.z * time * speed
+                );
         }
 
         public static bool CheckCollision(Vector3 position, Vector3 nextPosition)
@@ -38,6 +29,7 @@ namespace ProjectileAsset
             return Physics.Linecast(position, nextPosition);
         }
 
+        //POTENTIAL CLEANUP NEEDED
         public static PenetrationResult[] GetPenetrations(Vector3[] points)
         {
             var results = new List<PenetrationResult>();

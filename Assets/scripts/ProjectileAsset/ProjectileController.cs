@@ -45,6 +45,14 @@ namespace ProjectileAsset
 
         [SerializeField]
         [HideInInspector]
+        private float _gravityMultiplier;
+        public float GravityMultiplier
+        {
+            get => _gravityMultiplier;
+        }
+
+        [SerializeField]
+        [HideInInspector]
         private float _speed;
         public float Speed
         {
@@ -57,6 +65,7 @@ namespace ProjectileAsset
         protected virtual void OnPenetrationExit(Vector3 exitPoint, Vector3 exitDirection) { }
         protected virtual void OnRicochet(Vector3 entryDirection, Vector3 exitDirection) { }
 
+
         private Vector3 startPosition;
         private float startTime;
         protected void Awake()
@@ -67,8 +76,8 @@ namespace ProjectileAsset
 
         protected void FixedUpdate()
         {
-            var nextPosition = Projectile.CalculateTrajectory(Time.time - startTime + Time.fixedDeltaTime, startPosition, transform.position, transform.forward, FlightTrajectory, Speed);
-            var nextNextPosition = Projectile.CalculateTrajectory(Time.time - startTime + Time.fixedDeltaTime * 2, startPosition, transform.position, transform.forward, FlightTrajectory, Speed);
+            var nextPosition = Projectile.CalculateTrajectory(Time.time - startTime + Time.fixedDeltaTime, startPosition, transform.forward, GravityMultiplier, Speed);
+            var nextNextPosition = Projectile.CalculateTrajectory(Time.time - startTime + Time.fixedDeltaTime * 2, startPosition, transform.forward, GravityMultiplier, Speed);
             if (Projectile.CheckCollision(transform.position, nextPosition))
                 if (PenetrationEnabled)
                 {
@@ -78,7 +87,8 @@ namespace ProjectileAsset
                         if (result.Thickness <= Penetration)
                         {
                             OnPenetrationEnter(result.EntryPoint, Vector3.zero);
-                            OnPenetrationExit(result.ExitPoint, Vector3.zero);
+                            if (result.ExitPoint != null)
+                                OnPenetrationExit(result.ExitPoint, Vector3.zero);
                         }
                         else
                             Destroy(gameObject);
