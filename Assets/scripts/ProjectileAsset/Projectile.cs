@@ -40,28 +40,37 @@ namespace ProjectileAsset
 
         public static PenetrationResult[] GetPenetrations(Vector3[] points)
         {
-            var forward = 
-                Physics.RaycastAll(
-                origin: points[0],
-                direction: points[1] - points[0],
-                maxDistance: Vector3.Distance(points[0], points[1])).OrderBy(x => x.distance);
-
-            var backward =
-                Physics.RaycastAll(
-                origin: points[1],
-                direction: points[0] - points[1],
-                maxDistance: Vector3.Distance(points[0], points[1])).OrderBy(x => x.distance).ToArray();
-            
-            return forward.Select((entry, i) =>
+            var results = new List<PenetrationResult>();
+            for (int i = 0; i < points.Length - 1; i++)
             {
-                var exit = backward[backward.Length - 1 - i];
-                return new PenetrationResult(
-                    thickness: Vector3.Distance(entry.point, exit.point) * 1000,
-                    collider: entry.collider,
-                    entryPoint: entry.point,
-                    exitPoint: exit.point
-                );
-            }).ToArray();
+                var forward =
+                    Physics.RaycastAll(
+                    origin: points[0],
+                    direction: points[1] - points[0],
+                    maxDistance: Vector3.Distance(points[0], points[1])).OrderBy(x => x.distance);
+
+                var backward =
+                    Physics.RaycastAll(
+                    origin: points[1],
+                    direction: points[0] - points[1],
+                    maxDistance: Vector3.Distance(points[0], points[1])).OrderBy(x => x.distance).ToArray();
+
+                results.AddRange(forward.Select((entry, j) =>
+                {
+                    var exit = backward.ToList().ElementAtOrDefault(backward.Length - 1 - j);
+                    var thickness = float.PositiveInfinity;
+                    if (exit.point != null)
+                        thickness = Vector3.Distance(entry.point, exit.point) * 1000;
+
+                    return new PenetrationResult(
+                        thickness: thickness,
+                        collider: entry.collider,
+                        entryPoint: entry.point,
+                        exitPoint: exit.point
+                    );
+                }));
+            }
+            return results.ToArray();
         }
     }
 }

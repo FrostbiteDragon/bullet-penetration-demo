@@ -68,10 +68,11 @@ namespace ProjectileAsset
         protected void FixedUpdate()
         {
             var nextPosition = Projectile.CalculateTrajectory(Time.time - startTime + Time.fixedDeltaTime, startPosition, transform.position, transform.forward, FlightTrajectory, Speed);
+            var nextNextPosition = Projectile.CalculateTrajectory(Time.time - startTime + Time.fixedDeltaTime * 2, startPosition, transform.position, transform.forward, FlightTrajectory, Speed);
             if (Projectile.CheckCollision(transform.position, nextPosition))
                 if (PenetrationEnabled)
                 {
-                    var results = Projectile.GetPenetrations(new Vector3[] { transform.position, nextPosition });
+                    var results = Projectile.GetPenetrations(new Vector3[] { transform.position, nextPosition, nextNextPosition });
                     foreach (var result in results)
                     {
                         if (result.Thickness <= Penetration)
