@@ -10,7 +10,7 @@ namespace ProjectileAsset
 {
     public enum FlightTrajectory { Linear, Perabolic }
 
-    public static class Projectile
+    public static class ProjectileCSharp
     {
         public static Vector3 CalculateTrajectory(float time, Vector3 startPosition, Vector3 direction, float gravityMultiplier, float speed)
         {

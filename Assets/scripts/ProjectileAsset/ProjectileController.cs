@@ -77,19 +77,22 @@ namespace ProjectileAsset
         protected void FixedUpdate()
         {
             var nextPosition = Projectile.CalculateTrajectory(Time.time - startTime + Time.fixedDeltaTime, startPosition, transform.forward, GravityMultiplier, Speed);
-            var nextNextPosition = Projectile.CalculateTrajectory(Time.time - startTime + Time.fixedDeltaTime * 2, startPosition, transform.forward, GravityMultiplier, Speed);
-            if (Projectile.CheckCollision(transform.position, nextPosition))
+            var nextNextPosition = ProjectileCSharp.CalculateTrajectory(Time.time - startTime + Time.fixedDeltaTime * 2, startPosition, transform.forward, GravityMultiplier, Speed);
+            if (ProjectileCSharp.CheckCollision(transform.position, nextPosition))
                 if (PenetrationEnabled)
                 {
-                    var results = Projectile.GetPenetrations(new Vector3[] { transform.position, nextPosition, nextNextPosition });
+                    var results = ProjectileCSharp.GetPenetrations(new Vector3[] { transform.position, nextPosition, nextNextPosition });
                     foreach (var result in results)
                     {
+                        //if penetration is successful
                         if (result.Thickness <= Penetration)
                         {
                             OnPenetrationEnter(result.EntryPoint, Vector3.zero);
                             if (result.ExitPoint != null)
                                 OnPenetrationExit(result.ExitPoint, Vector3.zero);
                         }
+                        //if richochet
+                        //else if ()
                         else
                             Destroy(gameObject);
                     }

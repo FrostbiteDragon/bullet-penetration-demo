@@ -35,6 +35,7 @@ public class PlayerController : MonoBehaviour
 
         Destroy(body.GetComponent<MeshRenderer>());
         Destroy(body.GetComponent<MeshFilter>());
+
     }
 
     private void Update()
