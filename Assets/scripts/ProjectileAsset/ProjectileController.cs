@@ -8,8 +8,6 @@ namespace ProjectileAsset
 {
     public class ProjectileController : MonoBehaviour
     {
-        public GameObject prefab;
-
         [SerializeField] 
         [HideInInspector]
         private bool _penetrationEnabled;
@@ -84,9 +82,6 @@ namespace ProjectileAsset
                 if (PenetrationEnabled)
                 {
                     var results = Projectile.GetPenetrations(new Vector3[] { transform.position, nextPosition, nextNextPosition });
-                    Instantiate(prefab, transform.position, Quaternion.identity);
-                    Instantiate(prefab, nextPosition, Quaternion.identity);
-                    Instantiate(prefab, nextNextPosition, Quaternion.identity);
                     foreach (var result in results)
                     {
                         //if penetration is successful

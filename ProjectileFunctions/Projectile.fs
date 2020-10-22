@@ -18,22 +18,39 @@ module Projectile =
               startPosition.z + startDirection.z * time * speed )
 
     let GetPenetrations (points : Vector3[]) = 
-        seq {
-            for i in 0 .. points.Length - 2 do
                 let forward =
                     Physics.RaycastAll(
-                        points.[i],
-                        points.[i + 1] - points.[i],
-                        Vector3.Distance(points.[i], points.[i + 1]))
+                        points.[0],
+                        points.[1] - points.[0],
+                        Vector3.Distance(points.[0], points.[1]))
                     |> Array.sortBy(fun x -> x.distance)
     
                 let backwards = 
                     Physics.RaycastAll(
-                        points.[i + 1],
-                        points.[i] - points.[i + 1],
-                        Vector3.Distance(points.[i], points.[i + 1]))
+                        points.[1],
+                        points.[0] - points.[1],
+                        Vector3.Distance(points.[0], points.[1]))
                     |> Array.sortBy(fun x -> x.distance)
+
+                let backwards =
+                    if not(forward.Length = backwards.Length) then
+                        let nextBackwards =
+                            Physics.RaycastAll(
+                                points.[2],
+                                points.[1] - points.[2],
+                                Vector3.Distance(points.[1], points.[2]))
+                            |> Array.sortBy(fun x -> x.distance)
                     
+                        if nextBackwards.Length > 0 && forward.[forward.Length - 1].collider = nextBackwards.[nextBackwards.Length - 1].collider then
+                            backwards
+                            |> List.ofArray
+                            |> List.append [nextBackwards.[nextBackwards.Length - 1]]
+                            |> Array.ofList
+                        else
+                            backwards
+                    else
+                        backwards
+
                 let extractPenetrationResults (entry : RaycastHit) (exit : Option<RaycastHit>) =
                     let thickness =
                         match exit with
@@ -44,10 +61,7 @@ module Projectile =
                       entryHit = entry
                       exitHit = exit |> Option.toNullable }
     
-                yield forward
+                forward
                 |> Array.mapi (fun i x -> extractPenetrationResults x (backwards |> Array.tryItem (backwards.Length - i - 1)))
-        }
-        |> Seq.concat
-        |> Array.ofSeq
 
 

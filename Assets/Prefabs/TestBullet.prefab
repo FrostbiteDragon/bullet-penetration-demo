@@ -45,9 +45,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64776c7dabbf6324b9e3b39d30c88696, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefab: {fileID: 2811531241121297175, guid: c2e46107a4d4e6542a7c49fea1d3eeda, type: 3}
   _penetrationEnabled: 1
-  _penetration: 60000
+  _penetration: 4500
   _ricochetAngle: 0
   _flightTrajectory: 1
   _gravityMultiplier: 1
