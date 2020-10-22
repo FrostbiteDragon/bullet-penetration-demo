@@ -42,28 +42,31 @@ let GetPenetrations (points : Vector3[]) =
         for i in 0 .. points.Length - 1 do
             let forward =
                 Physics.RaycastAll(
-                    points.[0],
-                    points.[1] - points.[0],
-                    Vector3.Distance(points.[0], points.[1]))
+                    points.[i],
+                    points.[i + 1] - points.[i],
+                    Vector3.Distance(points.[i], points.[i + 1]))
                 |> Array.sortBy(fun x -> x.distance)
 
             let backwards = 
                 Physics.RaycastAll(
-                    points.[0],
-                    points.[0] - points.[1],
-                    Vector3.Distance(points.[0], points.[1]))
+                    points.[i],
+                    points.[i] - points.[i + 1],
+                    Vector3.Distance(points.[i], points.[i + 1]))
                 |> Array.sortBy(fun x -> x.distance)
                 
             let extractPenetrationResuslts (entry : RaycastHit) (exit : RaycastHit) =
-                let thickness = Single.PositiveInfinity
+                let thickness = 
+                    match forward.Length = backwards.Length with
+                    |true -> Vector3.Distance(entry.point, exit.point)
+                    |false -> Single.PositiveInfinity
+
                 { thickness = thickness
                   collider = entry.collider
                   entryPoint = entry.point
                   exitpoint = exit.point }
-                    
 
             yield forward
-            |> Array.mapi (fun x i -> extractPenetrationResuslts x)
+            |> Array.mapi (fun i x -> extractPenetrationResuslts x backwards.[i])
     }
     |> Seq.append Seq.empty
     |> Array.ofSeq

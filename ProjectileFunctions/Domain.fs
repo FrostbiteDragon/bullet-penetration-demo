@@ -1,4 +1,9 @@
 ﻿namespace ProjectileAsset
 
+open UnityEngine
+open System
+
 type PenetrationResults =
-    { thickness : float }
+    { thickness : single
+      entryHit : RaycastHit
+      exitHit : Nullable<RaycastHit> }
