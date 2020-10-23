@@ -45,10 +45,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64776c7dabbf6324b9e3b39d30c88696, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _layerMask:
+    serializedVersion: 2
+    m_Bits: 2048
   _penetrationEnabled: 1
   _penetration: 4500
   _ricochetAngle: 0
-  _flightTrajectory: 1
   _gravityMultiplier: 1
   _speed: 300
   bulletmarkPrefab: {fileID: 6454624227189403406, guid: d05453ac2bc5df74bb27e5dbd515bb1d,

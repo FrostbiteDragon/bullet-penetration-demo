@@ -17,37 +17,40 @@ module Projectile =
               speed * time * Mathf.Sin(angle * Mathf.Deg2Rad) - (4.9f * gravityMultiplier) * Mathf.Pow(time, 2.0f) + startPosition.y,
               startPosition.z + startDirection.z * time * speed )
 
-    let GetPenetrations (points : Vector3[]) = 
+    let GetPenetrations (points : Vector3[]) layerMask = 
         let validate (forward : RaycastHit[]) (backwards : RaycastHit[]) =
             match forward.Length = backwards.Length with
-            |true -> backwards
-            |false ->
+            | true -> backwards
+            | false ->
                 let nextBackwards =
                     Physics.RaycastAll(
                         points.[2],
                         points.[1] - points.[2],
-                        Vector3.Distance(points.[1], points.[2]))
+                        Vector3.Distance(points.[1], points.[2]), 
+                        layerMask)
                     |> Array.sortBy(fun x -> x.distance)
                     
-                match nextBackwards.Length > 0 && forward.[forward.Length - 1].collider = nextBackwards.[nextBackwards.Length - 1].collider with
-                |true -> backwards
-                            |> List.ofArray
-                            |> List.append [nextBackwards.[nextBackwards.Length - 1]]
-                            |> Array.ofList
+                match not <| (nextBackwards.Length > 0 && forward.[forward.Length - 1].collider = nextBackwards.[nextBackwards.Length - 1].collider) with
+                | true -> backwards
                 | false -> backwards
+                           |> List.ofArray
+                           |> List.append [nextBackwards.[nextBackwards.Length - 1]]
+                           |> Array.ofList
 
         let forward =
             Physics.RaycastAll(
                 points.[0],
                 points.[1] - points.[0],
-                Vector3.Distance(points.[0], points.[1]))
+                Vector3.Distance(points.[0], points.[1]),
+                layerMask)
             |> Array.sortBy(fun x -> x.distance)
     
         let backwards = 
             Physics.RaycastAll(
                 points.[1],
                 points.[0] - points.[1],
-                Vector3.Distance(points.[0], points.[1]))
+                Vector3.Distance(points.[0], points.[1]),
+                layerMask)
             |> Array.sortBy(fun x -> x.distance)
             |> validate forward
 
@@ -58,6 +61,7 @@ module Projectile =
                 |None -> Single.PositiveInfinity
 
             { thickness = thickness
+              dirrection = points.[1] - points.[0]
               entryHit = entry
               exitHit = exit |> Option.toNullable }
     

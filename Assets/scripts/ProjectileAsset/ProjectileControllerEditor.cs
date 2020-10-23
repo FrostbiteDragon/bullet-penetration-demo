@@ -9,6 +9,7 @@ namespace ProjectileAsset
     {
         SerializedProperty speed;
         SerializedProperty gravityMultiplier;
+        SerializedProperty layerMask;
         SerializedProperty penetrationEnabled;
         SerializedProperty penetration;
 
@@ -16,6 +17,7 @@ namespace ProjectileAsset
         {
             speed = serializedObject.FindProperty("_speed");
             gravityMultiplier = serializedObject.FindProperty("_gravityMultiplier");
+            layerMask = serializedObject.FindProperty("_layerMask");
             penetrationEnabled = serializedObject.FindProperty("_penetrationEnabled");
             penetration = serializedObject.FindProperty("_penetration");
 
@@ -32,6 +34,7 @@ namespace ProjectileAsset
             EditorGUILayout.PropertyField(gravityMultiplier);
             EditorGUILayout.Space();
 
+            EditorGUILayout.PropertyField(layerMask);
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Penetration", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold}, GUILayout.MinWidth(120));
             EditorGUILayout.PropertyField(penetrationEnabled, GUIContent.none, GUILayout.Width(Screen.width / 1.815f));
