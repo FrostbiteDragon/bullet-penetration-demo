@@ -45,7 +45,8 @@ module ProjectileNew =
                     { position = hit.point
                       startInfo = { position = hit.point; direction = outDirection; time = Time.time }
                       results = projectileResults.results |> Array.append [|result|] }
-                GetResults hit.point (outDirection * distanceLeft) (distanceLeft - hit.distance) projectileResult
+                let endPoint = Vector3(hit.point.x + outDirection.x * distanceLeft, hit.point.y + outDirection.y * distanceLeft, hit.point.z + outDirection.z * distanceLeft)
+                GetResults hit.point endPoint (distanceLeft - hit.distance) projectileResult
             //| Penetration -> GetResults startPoint endPoint distanceLeft projectileResults
             | _ -> { projectileResults with results = projectileResults.results |> Array.append [|result|] }
 
