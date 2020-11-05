@@ -4,20 +4,22 @@ open UnityEngine
 open System
 
 module Projectile =
-    let CalculateTrajectory time (startPosition : Vector3) (startDirection : Vector3) gravityMultiplier speed = 
+    let CalculateTrajectory (startPosition : Vector3) (startDirection : Vector3) gravityMultiplier speed time = 
         let angle = 
             let positiveAngle = Vector3.Angle(Vector3(startDirection.x, 0.0f, startDirection.z), startDirection)
     
             match startDirection.y >= 0.0f with
             | true -> positiveAngle
             | false -> -positiveAngle 
-    
+        
+
         Vector3
             ( startPosition.x + startDirection.x * time * speed,
               speed * time * Mathf.Sin(angle * Mathf.Deg2Rad) - (4.9f * gravityMultiplier) * Mathf.Pow(time, 2.0f) + startPosition.y,
               startPosition.z + startDirection.z * time * speed )
 
-    let GetPenetrations (points : Vector3[]) layerMask = 
+    let GetContacts (points : Vector3[]) layerMask = 
+
         let validate (forward : RaycastHit[]) (backwards : RaycastHit[]) =
             match forward.Length = backwards.Length with
             | true -> backwards
@@ -30,12 +32,13 @@ module Projectile =
                         layerMask)
                     |> Array.sortBy(fun x -> x.distance)
                     
-                match not <| (nextBackwards.Length > 0 && forward.[forward.Length - 1].collider = nextBackwards.[nextBackwards.Length - 1].collider) with
-                | true -> backwards
+                match nextBackwards.Length > 0 && forward.[forward.Length - 1].collider = nextBackwards.[nextBackwards.Length - 1].collider with
                 | false -> backwards
-                           |> List.ofArray
-                           |> List.append [nextBackwards.[nextBackwards.Length - 1]]
-                           |> Array.ofList
+                | true -> 
+                    backwards
+                    |> List.ofArray
+                    |> List.append [nextBackwards.[nextBackwards.Length - 1]]
+                    |> Array.ofList
 
         let forward =
             Physics.RaycastAll(

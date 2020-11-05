@@ -8,7 +8,7 @@ namespace ProjectileAsset
 {
     public class ProjectileController : MonoBehaviour
     {
-        [SerializeField] 
+        [SerializeField]
         [HideInInspector]
         private LayerMask _layerMask;
         public LayerMask LayerMask
@@ -17,7 +17,7 @@ namespace ProjectileAsset
             protected set => _layerMask = value;
         }
 
-        [SerializeField] 
+        [SerializeField]
         [HideInInspector]
         private bool _penetrationEnabled;
         public bool PenetrationEnabled
@@ -26,7 +26,7 @@ namespace ProjectileAsset
             protected set => _penetrationEnabled = value;
         }
 
-        [SerializeField] 
+        [SerializeField]
         [HideInInspector]
         private float _penetration;
         public float Penetration
@@ -35,9 +35,9 @@ namespace ProjectileAsset
             protected set => _penetration = value;
         }
 
-        [SerializeField] 
+        [SerializeField]
         [HideInInspector]
-        private float _ricochetAngle;
+        private float _ricochetAngle = 5;
         public float RicochetAngle
         {
             get => _ricochetAngle;
@@ -45,7 +45,7 @@ namespace ProjectileAsset
 
         [SerializeField]
         [HideInInspector]
-        private float _gravityMultiplier;
+        private float _gravityMultiplier = 1;
         public float GravityMultiplier
         {
             get => _gravityMultiplier;
@@ -53,35 +53,38 @@ namespace ProjectileAsset
 
         [SerializeField]
         [HideInInspector]
-        private float _speed;
+        private float _speed = 300;
         public float Speed
         {
             get => _speed;
             protected set => _speed = value;
         }
 
-        protected virtual void OnPenetrationFailed(float angle, Vector3 point) { }
+        protected virtual void OnPenetrationFailed(RaycastHit hit, Vector3 dirrection) { }
         protected virtual void OnPenetrationEnter(RaycastHit entry, Vector3 dirrection) { }
         protected virtual void OnPenetrationExit(RaycastHit exit, Vector3 dirrection) { }
-        protected virtual void OnRicochet(Vector3 entryDirection, Vector3 exitDirection) { }
+        protected virtual void OnRicochet(Vector3 entryDirection, Vector3 exitDirection, RaycastHit hit) { }
 
 
-        private Vector3 startPosition;
-        private float startTime;
+        private ProjectileStart projectileStart;
+        private ProjectileResult result;
         protected virtual void Awake()
         {
-            startPosition = transform.position;
-            startTime = Time.time;
+            projectileStart = new ProjectileStart(transform.position, transform.forward, Time.time);
+            _ricochetAngle = 45f;
+            result = ProjectileNew.CalculateTrajectory(projectileStart, Speed, Penetration, GravityMultiplier, RicochetAngle, LayerMask);
+            Time.timeScale = 0.1f;
         }
 
         protected void FixedUpdate()
         {
-            var nextPosition = Projectile.CalculateTrajectory(Time.time - startTime + Time.fixedDeltaTime, startPosition, transform.forward, GravityMultiplier, Speed);
+            /*var nextPosition = Projectile.CalculateTrajectory(Time.time - startTime + Time.fixedDeltaTime, startPosition, transform.forward, GravityMultiplier, Speed);
             var nextNextPosition = Projectile.CalculateTrajectory(Time.time - startTime + Time.fixedDeltaTime * 2, startPosition, transform.forward, GravityMultiplier, Speed);
             if (Physics.Linecast(transform.position, nextPosition, LayerMask.value))
                 if (PenetrationEnabled)
                 {
                     var results = Projectile.GetPenetrations(new Vector3[] { transform.position, nextPosition, nextNextPosition }, LayerMask.value);
+
                     foreach (var result in results)
                     {
                         //if penetration is successful
@@ -91,14 +94,16 @@ namespace ProjectileAsset
                             if (result.exitHit != null)
                                 OnPenetrationExit((RaycastHit)result.exitHit, result.dirrection);
                         }
-                        //if richochet
-                        //else if ()
                         else
-                            Destroy(gameObject);
+                            OnPenetrationFailed(result.entryHit, result.dirrection);
                     }
-                }
+                }*/
 
-            transform.position = nextPosition;
+            //transform.position = nextPosition;
+
+            result = ProjectileNew.CalculateTrajectory(result.startInfo, Speed, Penetration, GravityMultiplier, RicochetAngle, LayerMask);
+            Debug.Log(result.results[result.results.Length - 1]);
+            transform.position = result.position;
         }
     }
 }
