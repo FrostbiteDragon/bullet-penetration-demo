@@ -102,7 +102,11 @@ namespace ProjectileAsset
             //transform.position = nextPosition;
 
             result = ProjectileNew.CalculateTrajectory(result.startInfo, Speed, Penetration, GravityMultiplier, RicochetAngle, LayerMask);
-            Debug.Log(result.results[result.results.Length - 1]);
+            foreach (var hit in result.results)
+            {
+                if (hit is HitResult.Ricochet)
+                    Debug.Log("Ricohet!");
+            }
             transform.position = result.position;
         }
     }

@@ -18,7 +18,7 @@ module ProjectileNew =
                   speed * time * Mathf.Sin(angle * Mathf.Deg2Rad) - (4.9f * gravityMultiplier) * Mathf.Pow(time, 2.0f) + startInfo.position.y,
                   startInfo.position.z + startInfo.direction.z * time * speed )
 
-        let rec GetResults (startPoint : Vector3) (endPoint : Vector3) distanceLeft projectileResults =
+        let rec GetResults (startPoint : Vector3) (endPoint : Vector3) distanceLeft projectileResult =
             let mutable contact = RaycastHit()
             let hitObject = Physics.Linecast(startPoint, endPoint, &contact, layerMask)
 
@@ -36,19 +36,20 @@ module ProjectileNew =
                         let thickness = penetration
 
                         match thickness >= penetration with
-                        | true -> Penetration
-                        | false -> FailedPenetration
+                        | true -> Penetration(true)
+                        | false -> FailedPenetration(true)
 
             match result with
             | Ricochet (outDirection, _, _, hit) -> 
                 let projectileResult = 
                     { position = hit.point
                       startInfo = { position = hit.point; direction = outDirection; time = Time.time }
-                      results = projectileResults.results |> Array.append [|result|] }
+                      results = projectileResult.results |> Array.append [|result|] }
                 let endPoint = Vector3(hit.point.x + outDirection.x * distanceLeft, hit.point.y + outDirection.y * distanceLeft, hit.point.z + outDirection.z * distanceLeft)
                 GetResults hit.point endPoint (distanceLeft - hit.distance) projectileResult
             //| Penetration -> GetResults startPoint endPoint distanceLeft projectileResults
-            | _ -> { projectileResults with results = projectileResults.results |> Array.append [|result|] }
+            | NoContact -> projectileResult
+            | _ -> { projectileResult with results = projectileResult.results |> Array.append [|result|] }
 
         let startPoint = GetPosition startInfo (Time.time - startInfo.time)
         let endPoint = GetPosition startInfo (Time.time - startInfo.time + Time.fixedDeltaTime)
