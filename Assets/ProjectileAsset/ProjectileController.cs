@@ -1,13 +1,13 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace ProjectileAsset
 {
     public class ProjectileController : MonoBehaviour
     {
+        //DEBUG
+        public GameObject prefab;
+
         [SerializeField]
         [HideInInspector]
         private LayerMask _layerMask;
@@ -70,43 +70,47 @@ namespace ProjectileAsset
         private ProjectileResult result;
         protected virtual void Awake()
         {
-            projectileStart = new ProjectileStart(transform.position, transform.forward, Time.time);
-            _ricochetAngle = 45f;
-            result = ProjectileNew.CalculateTrajectory(projectileStart, Speed, Penetration, GravityMultiplier, RicochetAngle, LayerMask);
-            Time.timeScale = 0.1f;
+            //projectileStart = new ProjectileStart(transform.position, transform.forward, Time.fixedTime);
+            Instantiate(prefab, transform.position, Quaternion.identity);
+            SendMessage("OnPenetration");
+            //result = ProjectileNew.CalculateTrajectory(projectileStart, Speed, Penetration, GravityMultiplier, RicochetAngle, LayerMask, new Tuple<Vector3, Vector3>[0]);
+
+            _ricochetAngle = 90f;
         }
 
         protected void FixedUpdate()
         {
-            /*var nextPosition = Projectile.CalculateTrajectory(Time.time - startTime + Time.fixedDeltaTime, startPosition, transform.forward, GravityMultiplier, Speed);
-            var nextNextPosition = Projectile.CalculateTrajectory(Time.time - startTime + Time.fixedDeltaTime * 2, startPosition, transform.forward, GravityMultiplier, Speed);
-            if (Physics.Linecast(transform.position, nextPosition, LayerMask.value))
-                if (PenetrationEnabled)
-                {
-                    var results = Projectile.GetPenetrations(new Vector3[] { transform.position, nextPosition, nextNextPosition }, LayerMask.value);
+            result = ProjectileNew.CalculateTrajectory(
+                result?.startInfo ?? new ProjectileStart(transform.position, transform.forward, Time.fixedTime),
+                Speed,
+                Penetration,
+                GravityMultiplier,
+                RicochetAngle,
+                LayerMask,
+                result?.casts ?? new Tuple<Vector3, Vector3>[0]);
 
-                    foreach (var result in results)
-                    {
-                        //if penetration is successful
-                        if (result.thickness <= Penetration)
-                        {
-                            OnPenetrationEnter(result.entryHit, result.dirrection);
-                            if (result.exitHit != null)
-                                OnPenetrationExit((RaycastHit)result.exitHit, result.dirrection);
-                        }
-                        else
-                            OnPenetrationFailed(result.entryHit, result.dirrection);
-                    }
-                }*/
-
-            //transform.position = nextPosition;
-
-            result = ProjectileNew.CalculateTrajectory(result.startInfo, Speed, Penetration, GravityMultiplier, RicochetAngle, LayerMask);
             foreach (var hit in result.results)
             {
-                if (hit is HitResult.Ricochet)
-                    Debug.Log("Ricohet!");
+                switch (hit)
+                {
+                    case HitResult.Ricochet _:
+                        Debug.Log("Ricohet!");
+                        break;
+                    case HitResult.Penetration _:
+                        break;
+                }
             }
+            //DEBUG
+            foreach (var cast in result.casts)
+            {
+                var (start, end) = cast;
+                Debug.DrawLine(start, end);
+            }
+
+            Instantiate(prefab, result.position, Quaternion.identity);
+
+            //DEBUG
+
             transform.position = result.position;
         }
     }

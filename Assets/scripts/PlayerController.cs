@@ -49,11 +49,13 @@ public class PlayerController : MonoBehaviour
         {
             Camera.main.fieldOfView /= zoomLevel;
             sensitivity /= zoomLevel;
+            //Time.timeScale = 0.1f;
         }
         if (Input.GetKeyUp(KeyCode.Mouse1))
         {
             Camera.main.fieldOfView *= zoomLevel;
             sensitivity *= zoomLevel;
+            //Time.timeScale = 1;
         }
     }
 

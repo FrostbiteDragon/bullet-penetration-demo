@@ -28,4 +28,9 @@ public class TestImplementation : ProjectileController
     {
         Destroy(gameObject);
     }
+
+    void OnPenetration()
+    {
+        Debug.Log("test");
+    }
 }

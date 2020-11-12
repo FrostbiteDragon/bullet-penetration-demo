@@ -5,7 +5,7 @@ open System
 
 module ProjectileNew =
 
-    let CalculateTrajectory (startInfo : ProjectileStart ) speed (penetration : single) gravityMultiplier ricochetAngle layerMask = 
+    let CalculateTrajectory (startInfo : ProjectileStart ) speed (penetration : single) gravityMultiplier ricochetAngle layerMask casts = 
         let GetPosition startInfo time = 
             let angle = 
                 let positiveAngle = Vector3.Angle(Vector3(startInfo.direction.x, 0.0f, startInfo.direction.z), startInfo.direction)
@@ -19,8 +19,14 @@ module ProjectileNew =
                   startInfo.position.z + startInfo.direction.z * time * speed )
 
         let rec GetResults (startPoint : Vector3) (endPoint : Vector3) distanceLeft projectileResult =
+            let color = Color(single <| Random.Range(0f, 1f), single <| Random.Range(0f, 1f), single <| Random.Range(0f, 1f), 1f)
+
             let mutable contact = RaycastHit()
+            //DEBUG
             let hitObject = Physics.Linecast(startPoint, endPoint, &contact, layerMask)
+            let projectileResult = { projectileResult with 
+                                        casts = projectileResult.casts |> Array.append [|(startPoint, endPoint)|] }
+            //DEBUG
 
             let result =
                 match hitObject with
@@ -41,16 +47,23 @@ module ProjectileNew =
 
             match result with
             | Ricochet (outDirection, _, _, hit) -> 
-                let projectileResult = 
-                    { position = hit.point
-                      startInfo = { position = hit.point; direction = outDirection; time = Time.time }
-                      results = projectileResult.results |> Array.append [|result|] }
-                let endPoint = Vector3(hit.point.x + outDirection.x * distanceLeft, hit.point.y + outDirection.y * distanceLeft, hit.point.z + outDirection.z * distanceLeft)
-                GetResults hit.point endPoint (distanceLeft - hit.distance) projectileResult
-            //| Penetration -> GetResults startPoint endPoint distanceLeft projectileResults
-            | NoContact -> projectileResult
-            | _ -> { projectileResult with results = projectileResult.results |> Array.append [|result|] }
+                let distanceLeft = distanceLeft - hit.distance
+                let newEndPoint = Vector3(hit.point.x + outDirection.x * distanceLeft, hit.point.y + outDirection.y * distanceLeft, hit.point.z + outDirection.z * distanceLeft)
+                let newProjectileResult = 
+                    { projectileResult with
+                        position = hit.point
+                        startInfo = { position = hit.point; direction = outDirection; time = Time.fixedTime }
+                        results = projectileResult.results |> Array.append [|result|] }
+                GetResults hit.point newEndPoint distanceLeft newProjectileResult
 
-        let startPoint = GetPosition startInfo (Time.time - startInfo.time)
-        let endPoint = GetPosition startInfo (Time.time - startInfo.time + Time.fixedDeltaTime)
-        GetResults startPoint endPoint (Vector3.Distance(startPoint, endPoint)) {position = startPoint; startInfo = startInfo; results = [||]}
+            //| Penetration -> GetResults startPoint endPoint distanceLeft projectileResults
+            | NoContact -> 
+                { projectileResult with 
+                    position = endPoint
+                    startInfo = { position = endPoint; direction = -(startPoint - endPoint).normalized; time = Time.fixedTime }}
+
+            //| _ -> { projectileResult with results = projectileResult.results |> Array.append [|result|] }
+
+        let startPoint = GetPosition startInfo (0f)
+        let endPoint = GetPosition startInfo (Time.fixedDeltaTime)
+        GetResults startPoint endPoint (Vector3.Distance(startPoint, endPoint)) {position = startPoint; startInfo = startInfo; results = [||]; casts = casts}

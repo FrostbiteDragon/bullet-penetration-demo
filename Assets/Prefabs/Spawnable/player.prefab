@@ -57,6 +57,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -81,6 +82,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!65 &4273554457446004464
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -104,7 +106,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4273554457584719844}
   - component: {fileID: 4273554457584719847}
-  - component: {fileID: 1928640537603093365}
   - component: {fileID: 4273554457584719846}
   m_Layer: 8
   m_Name: player
@@ -143,8 +144,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   head: {fileID: 4273554457446004467}
   body: {fileID: 4273554458893979269}
-  cameraPrefab: {fileID: 1029634598548270, guid: 7895168e9a260824e9c6c46c0749c01f,
-    type: 3}
   BulletPrefab: {fileID: 1264009394180872, guid: 8e9dffef2f6c61943bfe9d72a10654ce,
     type: 3}
   jumpHight: 3
@@ -152,30 +151,6 @@ MonoBehaviour:
   sprintMultiplier: 1
   sensitivity: 500
   zoomLevel: 2
---- !u!114 &1928640537603093365
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4273554457584719840}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9fe2a6535b4aa494e9cf81b9a30a533d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  bulletPrefab: {fileID: 1264009394180872, guid: 8e9dffef2f6c61943bfe9d72a10654ce,
-    type: 3}
-  receiver:
-    fireRate: 1000
-    calliber: 0
-    trigger: 1
-  magazine:
-    maxCapacity: 100
-    currentCapacity: 30
-    reloadTime: 0
-  barel:
-    length: 1.5
 --- !u!54 &4273554457584719846
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -261,6 +236,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -285,6 +261,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &4273554459208747944
 GameObject:
   m_ObjectHideFlags: 0
@@ -300,7 +277,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4273554459208747945
 Transform:
   m_ObjectHideFlags: 0

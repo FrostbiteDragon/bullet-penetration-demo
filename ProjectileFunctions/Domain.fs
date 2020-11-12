@@ -31,4 +31,5 @@ type HitResult =
 type ProjectileResult =
     { position : Vector3
       startInfo : ProjectileStart
-      results : HitResult array }
+      results : HitResult array
+      casts : (Vector3 * Vector3) array} //DEBUG
