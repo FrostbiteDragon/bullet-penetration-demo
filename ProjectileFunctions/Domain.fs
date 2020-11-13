@@ -19,17 +19,15 @@ type Peramaters =
 
 type ProjectileStart =
     { position : Vector3
-      direction : Vector3 
-      time : single }
+      direction : Vector3 }
 
 type HitResult =
 | Ricochet of outDirection : Vector3 * inDirection : Vector3 * angle : single * hit : RaycastHit
-| Penetration of bool
-| FailedPenetration of bool
+| Penetration of direction : Vector3 * entry : RaycastHit * exit : RaycastHit * thickness : single
+| FailedPenetration of direction : Vector3 * hit : RaycastHit * thickness : single
 | NoContact
 
 type ProjectileResult =
     { position : Vector3
       startInfo : ProjectileStart
-      results : HitResult array
-      casts : (Vector3 * Vector3) array} //DEBUG
+      results : HitResult array }

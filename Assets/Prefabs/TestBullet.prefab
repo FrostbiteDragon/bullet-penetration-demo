@@ -53,7 +53,7 @@ MonoBehaviour:
   _penetration: 60
   _ricochetAngle: 0
   _gravityMultiplier: 1
-  _speed: 600
+  _speed: 200
   bulletmarkPrefab: {fileID: 6454624227189403406, guid: d05453ac2bc5df74bb27e5dbd515bb1d,
     type: 3}
 --- !u!23 &6306622401768653117

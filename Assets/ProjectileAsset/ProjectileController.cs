@@ -71,8 +71,7 @@ namespace ProjectileAsset
         protected virtual void Awake()
         {
             //projectileStart = new ProjectileStart(transform.position, transform.forward, Time.fixedTime);
-            Instantiate(prefab, transform.position, Quaternion.identity);
-            SendMessage("OnPenetration");
+            //Instantiate(prefab, transform.position, Quaternion.identity);
             //result = ProjectileNew.CalculateTrajectory(projectileStart, Speed, Penetration, GravityMultiplier, RicochetAngle, LayerMask, new Tuple<Vector3, Vector3>[0]);
 
             _ricochetAngle = 90f;
@@ -81,36 +80,30 @@ namespace ProjectileAsset
         protected void FixedUpdate()
         {
             result = ProjectileNew.CalculateTrajectory(
-                result?.startInfo ?? new ProjectileStart(transform.position, transform.forward, Time.fixedTime),
+                result?.startInfo ?? new ProjectileStart(transform.position, transform.forward ),
                 Speed,
                 Penetration,
                 GravityMultiplier,
                 RicochetAngle,
-                LayerMask,
-                result?.casts ?? new Tuple<Vector3, Vector3>[0]);
+                LayerMask);
 
             foreach (var hit in result.results)
             {
                 switch (hit)
                 {
-                    case HitResult.Ricochet _:
-                        Debug.Log("Ricohet!");
+                    case HitResult.Ricochet x:
+                        Debug.Log($"Ricohet! {x.angle}");
                         break;
-                    case HitResult.Penetration _:
+                    case HitResult.Penetration x:
+                        OnPenetrationEnter(x.entry, x.direction);
+                        OnPenetrationExit(x.exit, x.direction);
+                        break;
+                    case HitResult.FailedPenetration x:
+                        Debug.Log($"Failed Penetration :( {x.thickness}");
+                        Destroy(gameObject);
                         break;
                 }
             }
-            //DEBUG
-            foreach (var cast in result.casts)
-            {
-                var (start, end) = cast;
-                Debug.DrawLine(start, end);
-            }
-
-            Instantiate(prefab, result.position, Quaternion.identity);
-
-            //DEBUG
-
             transform.position = result.position;
         }
     }
