@@ -61,9 +61,9 @@ namespace ProjectileAsset
         }
 
         protected virtual void OnPenetrationFailed(RaycastHit hit, Vector3 dirrection) { }
-        protected virtual void OnPenetrationEnter(RaycastHit entry, Vector3 dirrection) { }
+        protected virtual void OnPenetrationEnter(RaycastHit entry, Vector3 dirrection, float thickness) { }
         protected virtual void OnPenetrationExit(RaycastHit exit, Vector3 dirrection) { }
-        protected virtual void OnRicochet(Vector3 entryDirection, Vector3 exitDirection, RaycastHit hit) { }
+        protected virtual void OnRicochet(float inAngle, Vector3 entryDirection, Vector3 exitDirection, RaycastHit hit) { }
 
 
         private ProjectileStart projectileStart;
@@ -74,7 +74,7 @@ namespace ProjectileAsset
             //Instantiate(prefab, transform.position, Quaternion.identity);
             //result = ProjectileNew.CalculateTrajectory(projectileStart, Speed, Penetration, GravityMultiplier, RicochetAngle, LayerMask, new Tuple<Vector3, Vector3>[0]);
 
-            _ricochetAngle = 90f;
+            _ricochetAngle = 5f;
         }
 
         protected void FixedUpdate()
@@ -91,16 +91,15 @@ namespace ProjectileAsset
             {
                 switch (hit)
                 {
-                    case HitResult.Ricochet x:
-                        Debug.Log($"Ricohet! {x.angle}");
+                    case HitResult.Ricochet ricochet:
+                        OnRicochet(ricochet.angle, ricochet.inDirection, ricochet.outDirection, ricochet.hit);
                         break;
-                    case HitResult.Penetration x:
-                        OnPenetrationEnter(x.entry, x.direction);
-                        OnPenetrationExit(x.exit, x.direction);
+                    case HitResult.Penetration penetration:
+                        OnPenetrationEnter(penetration.entry, penetration.direction, penetration.thickness);
+                        OnPenetrationExit(penetration.exit, penetration.direction);
                         break;
-                    case HitResult.FailedPenetration x:
-                        Debug.Log($"Failed Penetration :( {x.thickness}");
-                        Destroy(gameObject);
+                    case HitResult.FailedPenetration failedPen:
+                        OnPenetrationFailed(failedPen.hit, failedPen.direction);
                         break;
                 }
             }

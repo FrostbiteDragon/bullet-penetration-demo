@@ -33,8 +33,8 @@ module ProjectileNew =
                         let outDirection = Vector3.Reflect(inDirection, contact.normal).normalized
                         Ricochet(outDirection, inDirection, angle, contact)
                     else
-                        let hits = 
-                            let backCastStartPoint = Vector3(contact.point.x + inDirection.x, contact.point.y + inDirection.y, contact.point.z + inDirection.z) * 10f
+                        let hits =  
+                            let backCastStartPoint = Vector3(contact.point.x + inDirection.x * 10f, contact.point.y + inDirection.y * 10f, contact.point.z + inDirection.z * 10f)
                             Physics.RaycastAll(
                                 backCastStartPoint,
                                 contact.point - backCastStartPoint,
@@ -46,7 +46,7 @@ module ProjectileNew =
                             FailedPenetration(inDirection, contact, Single.PositiveInfinity)
                         else
                             let exitHit = Array.last(hits)
-                            let thickness = Vector3.Distance(contact.point, exitHit.point)
+                            let thickness = Vector3.Distance(contact.point, exitHit.point) * 1000f
 
                             if thickness < penetration
                                 then Penetration(inDirection, contact, exitHit, thickness)
@@ -67,12 +67,14 @@ module ProjectileNew =
                 let newDistanceLeft = distanceLeft - Vector3.Distance(startPoint, exit.point)
                 GetResults 
                     exit.point
-                    (Vector3(exit.point.x + direction.x, exit.point.y + direction.y, exit.point.z + direction.z) * newDistanceLeft)
+                    (Vector3(exit.point.x + direction.x * newDistanceLeft, exit.point.y + direction.y * newDistanceLeft, exit.point.z + direction.z * newDistanceLeft) )
                     newDistanceLeft 
                     { projectileResult with position =  entry.point; results = projectileResult.results |> Array.append [|result|] }
 
-            | FailedPenetration _ ->
-                { projectileResult with results = projectileResult.results |> Array.append [|result|] }
+            | FailedPenetration (_,hit,_) ->
+                { projectileResult with 
+                    position = hit.point
+                    results = projectileResult.results |> Array.append [|result|] }
             | NoContact -> 
                 { projectileResult with 
                     position = endPoint

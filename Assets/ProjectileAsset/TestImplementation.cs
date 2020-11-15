@@ -13,15 +13,15 @@ public class TestImplementation : ProjectileController
         color = new Color32((byte)Random.Range(0, 255), (byte)Random.Range(0, 255), (byte)Random.Range(0, 255), 255);
     }
 
-    protected override void OnPenetrationEnter(RaycastHit entry, Vector3 dirrection)
+    protected override void OnPenetrationEnter(RaycastHit entry, Vector3 dirrection, float thickness)
     {
-        var mark = Instantiate(bulletmarkPrefab, entry.point + entry.normal * 0.01f, Quaternion.LookRotation(entry.normal), entry.transform);
+        var mark = Instantiate(bulletmarkPrefab, entry.point + entry.normal * 0.01f, Quaternion.LookRotation(entry.normal));
         mark.GetComponent<SpriteRenderer>().color = color;
     }
 
     protected override void OnPenetrationExit(RaycastHit exit, Vector3 dirrection)
     {
-        Instantiate(bulletmarkPrefab, exit.point + exit.normal * 0.01f, Quaternion.LookRotation(exit.normal), exit.transform).GetComponent<SpriteRenderer>().color = color;
+        Instantiate(bulletmarkPrefab, exit.point + exit.normal * 0.01f, Quaternion.LookRotation(exit.normal)).GetComponent<SpriteRenderer>().color = color;
     }
 
     protected override void OnPenetrationFailed(RaycastHit hit, Vector3 dirrection)
