@@ -62,7 +62,7 @@ module ProjectileNew =
                       results = projectileResult.results |> Array.append [|result|] }
                 GetResults hit.point newEndPoint distanceLeft newProjectileResult
 
-            | Penetration (direction, entry, exit, _) -> //{ projectileResult with results = projectileResult.results |> Array.append [|result|] }
+            | Penetration (direction, entry, exit, _) ->
                 let newDistanceLeft = distanceLeft - Vector3.Distance(startPoint, exit.point)
                 GetResults 
                     exit.point
@@ -79,7 +79,7 @@ module ProjectileNew =
             | NoContact -> 
                 { projectileResult with 
                     position = endPoint 
-                    volocity = (endPoint - startPoint) * speed}
+                    volocity = (endPoint - startPoint)}
 
         let startPoint = GetPosition position direction 0f
         let endPoint = GetPosition position direction Time.fixedDeltaTime

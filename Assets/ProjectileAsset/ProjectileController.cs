@@ -66,7 +66,6 @@ namespace ProjectileAsset
         protected virtual void OnRicochet(float inAngle, Vector3 entryDirection, Vector3 exitDirection, RaycastHit hit) { }
 
 
-        private ProjectileStart projectileStart;
         private ProjectileResult result;
         protected virtual void Awake()
         {
