@@ -31,7 +31,7 @@ module ProjectileNew =
 
                     if angle <= ricochetAngle then
                         let outDirection = Vector3.Reflect(inDirection, contact.normal).normalized
-                        Ricochet(outDirection, inDirection, angle, contact)
+                        Ricochet(inDirection * speed, outDirection * speed, angle, contact)
                     else
                         let hits =  
                             let backCastStartPoint = Vector3(contact.point.x + inDirection.x * 10f, contact.point.y + inDirection.y * 10f, contact.point.z + inDirection.z * 10f)
@@ -43,24 +43,29 @@ module ProjectileNew =
                             |> Array.sortBy(fun x -> x.distance)
                         
                         if hits.Length = 0 then
-                            FailedPenetration(inDirection, contact, Single.PositiveInfinity)
+                            FailedPenetration(inDirection * speed, contact, Single.PositiveInfinity)
                         else
                             let exitHit = Array.last(hits)
                             let thickness = Vector3.Distance(contact.point, exitHit.point) * 1000f
 
                             if thickness < penetration
-                                then Penetration(inDirection, contact, exitHit, thickness)
-                                else FailedPenetration(inDirection, contact, Single.PositiveInfinity)
+                                then Penetration(inDirection * speed, contact, exitHit, thickness)
+                                else FailedPenetration(inDirection * speed, contact, Single.PositiveInfinity)
 
             match result with
-            | Ricochet (outDirection, _, _, hit) -> 
-                let distanceLeft = distanceLeft - hit.distance
-                let newEndPoint = Vector3(hit.point.x + outDirection.x * distanceLeft, hit.point.y + outDirection.y * distanceLeft, hit.point.z + outDirection.z * distanceLeft)
+            | Ricochet (_, outVelocity, _, hit) -> 
+                let newDistanceLeft = distanceLeft - hit.distance
+
+                let newEndPoint = 
+                    let outDirection = outVelocity.normalized
+                    Vector3(hit.point.x + outDirection.x * newDistanceLeft, hit.point.y + outDirection.y * newDistanceLeft, hit.point.z + outDirection.z * newDistanceLeft)
+
                 let newProjectileResult = 
                     { position = hit.point
-                      volocity = outDirection * speed
+                      volocity = outVelocity
                       results = projectileResult.results |> Array.append [|result|] }
-                GetResults hit.point newEndPoint distanceLeft newProjectileResult
+
+                GetResults hit.point newEndPoint newDistanceLeft newProjectileResult
 
             | Penetration (direction, entry, exit, _) ->
                 let newDistanceLeft = distanceLeft - Vector3.Distance(startPoint, exit.point)

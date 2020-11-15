@@ -22,9 +22,9 @@ type ProjectileStart =
       direction : Vector3 }
 
 type HitResult =
-| Ricochet of outDirection : Vector3 * inDirection : Vector3 * angle : single * hit : RaycastHit
-| Penetration of direction : Vector3 * entry : RaycastHit * exit : RaycastHit * thickness : single
-| FailedPenetration of direction : Vector3 * hit : RaycastHit * thickness : single
+| Ricochet of inVelocity : Vector3 * outVelocity : Vector3 * angle : single * hit : RaycastHit
+| Penetration of velocity : Vector3 * entry : RaycastHit * exit : RaycastHit * thickness : single
+| FailedPenetration of velocity : Vector3 * hit : RaycastHit * thickness : single
 | NoContact
 
 type ProjectileResult =

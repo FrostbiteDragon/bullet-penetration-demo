@@ -60,9 +60,9 @@ namespace ProjectileAsset
             protected set => _speed = value;
         }
 
-        protected virtual void OnPenetrationFailed(RaycastHit hit, Vector3 dirrection) { }
-        protected virtual void OnPenetrationEnter(RaycastHit entry, Vector3 dirrection, float thickness) { }
-        protected virtual void OnPenetrationExit(RaycastHit exit, Vector3 dirrection) { }
+        protected virtual void OnPenetrationEnter(RaycastHit entry, Vector3 velocity, float thickness) { }
+        protected virtual void OnPenetrationExit(RaycastHit exit, Vector3 velocity) { }
+        protected virtual void OnPenetrationFailed(RaycastHit hit, Vector3 velocity) { }
         protected virtual void OnRicochet(float inAngle, Vector3 entryDirection, Vector3 exitDirection, RaycastHit hit) { }
 
 
@@ -92,14 +92,14 @@ namespace ProjectileAsset
                 switch (hit)
                 {
                     case HitResult.Ricochet ricochet:
-                        OnRicochet(ricochet.angle, ricochet.inDirection, ricochet.outDirection, ricochet.hit);
+                        OnRicochet(ricochet.angle, ricochet.inVelocity, ricochet.outVelocity, ricochet.hit);
                         break;
                     case HitResult.Penetration penetration:
-                        OnPenetrationEnter(penetration.entry, penetration.direction, penetration.thickness);
-                        OnPenetrationExit(penetration.exit, penetration.direction);
+                        OnPenetrationEnter(penetration.entry, penetration.velocity, penetration.thickness);
+                        OnPenetrationExit(penetration.exit, penetration.velocity);
                         break;
                     case HitResult.FailedPenetration failedPen:
-                        OnPenetrationFailed(failedPen.hit, failedPen.direction);
+                        OnPenetrationFailed(failedPen.hit, failedPen.velocity);
                         break;
                 }
             }
