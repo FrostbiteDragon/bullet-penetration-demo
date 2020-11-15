@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace ProjectileAsset
 {
-    public class ProjectileController : MonoBehaviour
+    public abstract class ProjectileController : MonoBehaviour
     {
         //DEBUG
         public GameObject prefab;
@@ -80,7 +80,8 @@ namespace ProjectileAsset
         protected void FixedUpdate()
         {
             result = ProjectileNew.CalculateTrajectory(
-                result?.startInfo ?? new ProjectileStart(transform.position, transform.forward ),
+                transform.position,
+                result?.volocity.normalized ?? transform.forward,
                 Speed,
                 Penetration,
                 GravityMultiplier,

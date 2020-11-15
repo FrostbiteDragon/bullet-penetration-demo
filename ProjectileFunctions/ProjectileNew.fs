@@ -5,18 +5,18 @@ open System
 
 module ProjectileNew =
 
-    let CalculateTrajectory (startInfo : ProjectileStart ) speed (penetration : single) gravityMultiplier ricochetAngle layerMask = 
-        let GetPosition startInfo time = 
+    let CalculateTrajectory position direction speed (penetration : single) gravityMultiplier ricochetAngle layerMask = 
+        let GetPosition (position : Vector3) (direction : Vector3) time = 
             let angle = 
-                let positiveAngle = Vector3.Angle(Vector3(startInfo.direction.x, 0.0f, startInfo.direction.z), startInfo.direction)
-                match startInfo.direction.y >= 0.0f with
+                let positiveAngle = Vector3.Angle(Vector3(direction.x, 0.0f, direction.z), direction)
+                match direction.y >= 0.0f with
                 | true -> positiveAngle
                 | false -> -positiveAngle 
         
             Vector3
-                ( startInfo.position.x + startInfo.direction.x * time * speed,
-                  speed * time * Mathf.Sin(angle * Mathf.Deg2Rad) - (4.9f * gravityMultiplier) * Mathf.Pow(time, 2.0f) + startInfo.position.y,
-                  startInfo.position.z + startInfo.direction.z * time * speed )
+                ( position.x + direction.x * time * speed,
+                  speed * time * Mathf.Sin(angle * Mathf.Deg2Rad) - (4.9f * gravityMultiplier) * Mathf.Pow(time, 2.0f) + position.y,
+                  position.z + direction.z * time * speed )
 
         let rec GetResults (startPoint : Vector3) (endPoint : Vector3) distanceLeft projectileResult =
             let mutable contact = RaycastHit()
@@ -57,10 +57,9 @@ module ProjectileNew =
                 let distanceLeft = distanceLeft - hit.distance
                 let newEndPoint = Vector3(hit.point.x + outDirection.x * distanceLeft, hit.point.y + outDirection.y * distanceLeft, hit.point.z + outDirection.z * distanceLeft)
                 let newProjectileResult = 
-                    { projectileResult with
-                        position = hit.point
-                        startInfo = { position = hit.point; direction = outDirection; }
-                        results = projectileResult.results |> Array.append [|result|] }
+                    { position = hit.point
+                      volocity = outDirection * speed
+                      results = projectileResult.results |> Array.append [|result|] }
                 GetResults hit.point newEndPoint distanceLeft newProjectileResult
 
             | Penetration (direction, entry, exit, _) -> //{ projectileResult with results = projectileResult.results |> Array.append [|result|] }
@@ -69,7 +68,9 @@ module ProjectileNew =
                     exit.point
                     (Vector3(exit.point.x + direction.x * newDistanceLeft, exit.point.y + direction.y * newDistanceLeft, exit.point.z + direction.z * newDistanceLeft) )
                     newDistanceLeft 
-                    { projectileResult with position =  entry.point; results = projectileResult.results |> Array.append [|result|] }
+                    { position = entry.point
+                      volocity = direction * speed
+                      results = projectileResult.results |> Array.append [|result|] }
 
             | FailedPenetration (_,hit,_) ->
                 { projectileResult with 
@@ -77,11 +78,9 @@ module ProjectileNew =
                     results = projectileResult.results |> Array.append [|result|] }
             | NoContact -> 
                 { projectileResult with 
-                    position = endPoint
-                    startInfo = { position = endPoint; direction = -(startPoint - endPoint).normalized }}
+                    position = endPoint 
+                    volocity = (endPoint - startPoint) * speed}
 
-            //| _ -> { projectileResult with results = projectileResult.results |> Array.append [|result|] }
-
-        let startPoint = GetPosition startInfo (0f)
-        let endPoint = GetPosition startInfo (Time.fixedDeltaTime)
-        GetResults startPoint endPoint (Vector3.Distance(startPoint, endPoint)) { position = startPoint; startInfo = startInfo; results = [||]; }
+        let startPoint = GetPosition position direction 0f
+        let endPoint = GetPosition position direction Time.fixedDeltaTime
+        GetResults startPoint endPoint (Vector3.Distance(startPoint, endPoint)) { position = startPoint; volocity = direction * speed; results = [||]; }
