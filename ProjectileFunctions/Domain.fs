@@ -29,5 +29,5 @@ type HitResult =
 
 type ProjectileResult =
     { position : Vector3
-      volocity : Vector3
+      velocity : Vector3
       results : HitResult array }

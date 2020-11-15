@@ -80,8 +80,8 @@ namespace ProjectileAsset
         {
             result = ProjectileNew.CalculateTrajectory(
                 transform.position,
-                result?.volocity.normalized ?? transform.forward,
-                Speed,
+                result?.velocity.normalized ?? transform.forward,
+                result?.velocity.magnitude ?? Speed,
                 Penetration,
                 GravityMultiplier,
                 RicochetAngle,

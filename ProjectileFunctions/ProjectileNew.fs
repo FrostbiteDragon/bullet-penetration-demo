@@ -62,19 +62,20 @@ module ProjectileNew =
 
                 let newProjectileResult = 
                     { position = hit.point
-                      volocity = outVelocity
+                      velocity = outVelocity
                       results = projectileResult.results |> Array.append [|result|] }
 
                 GetResults hit.point newEndPoint newDistanceLeft newProjectileResult
 
-            | Penetration (direction, entry, exit, _) ->
-                let newDistanceLeft = distanceLeft - Vector3.Distance(startPoint, exit.point)
+            | Penetration (velocity, entry, exit, _) ->
+                let newDistanceLeft = distanceLeft - entry.distance
+                let direction = velocity.normalized
                 GetResults 
-                    exit.point
-                    (Vector3(exit.point.x + direction.x * newDistanceLeft, exit.point.y + direction.y * newDistanceLeft, exit.point.z + direction.z * newDistanceLeft) )
+                    (Vector3(entry.point.x + direction.x * 0.01f, entry.point.y + direction.y * 0.01f, entry.point.z + direction.z * 0.01f))
+                    (Vector3(exit.point.x + direction.x * newDistanceLeft, exit.point.y + direction.y * newDistanceLeft, exit.point.z + direction.z * newDistanceLeft))
                     newDistanceLeft 
                     { position = entry.point
-                      volocity = direction * speed
+                      velocity = velocity
                       results = projectileResult.results |> Array.append [|result|] }
 
             | FailedPenetration (_,hit,_) ->
@@ -84,8 +85,8 @@ module ProjectileNew =
             | NoContact -> 
                 { projectileResult with 
                     position = endPoint 
-                    volocity = (endPoint - startPoint)}
+                    velocity = (endPoint - startPoint).normalized * speed}
 
         let startPoint = GetPosition position direction 0f
         let endPoint = GetPosition position direction Time.fixedDeltaTime
-        GetResults startPoint endPoint (Vector3.Distance(startPoint, endPoint)) { position = startPoint; volocity = direction * speed; results = [||]; }
+        GetResults startPoint endPoint (Vector3.Distance(startPoint, endPoint)) { position = startPoint; velocity = direction * speed; results = [||]; }
