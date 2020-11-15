@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace ProjectileAsset
 {
-    public class ProjectileController : MonoBehaviour
+    public abstract class ProjectileController : MonoBehaviour
     {
         //DEBUG
         public GameObject prefab;
@@ -66,7 +66,6 @@ namespace ProjectileAsset
         protected virtual void OnRicochet(float inAngle, Vector3 entryDirection, Vector3 exitDirection, RaycastHit hit) { }
 
 
-        private ProjectileStart projectileStart;
         private ProjectileResult result;
         protected virtual void Awake()
         {
@@ -80,7 +79,8 @@ namespace ProjectileAsset
         protected void FixedUpdate()
         {
             result = ProjectileNew.CalculateTrajectory(
-                result?.startInfo ?? new ProjectileStart(transform.position, transform.forward ),
+                transform.position,
+                result?.volocity.normalized ?? transform.forward,
                 Speed,
                 Penetration,
                 GravityMultiplier,
