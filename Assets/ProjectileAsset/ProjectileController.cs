@@ -60,6 +60,8 @@ namespace ProjectileAsset
             protected set => _speed = value;
         }
 
+        public Vector3 Velocity { get; private set; }
+
         protected virtual void OnPenetrationEnter(RaycastHit entry, Vector3 velocity, float thickness) { }
         protected virtual void OnPenetrationExit(RaycastHit exit, Vector3 velocity) { }
         protected virtual void OnPenetrationFailed(RaycastHit hit, Vector3 velocity) { }
@@ -76,7 +78,7 @@ namespace ProjectileAsset
             _ricochetAngle = 5f;
         }
 
-        protected void FixedUpdate()
+        protected virtual void FixedUpdate()
         {
             result = ProjectileNew.CalculateTrajectory(
                 transform.position,
@@ -104,6 +106,7 @@ namespace ProjectileAsset
                 }
             }
             transform.position = result.position;
+            Velocity = result.velocity;
         }
     }
 }

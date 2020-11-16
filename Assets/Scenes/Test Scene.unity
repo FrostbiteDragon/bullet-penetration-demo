@@ -709,6 +709,11 @@ PrefabInstance:
       propertyPath: zoomLevel
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 4273554457584719847, guid: 75a7cf057c0404e4a822958a2c5eeede,
+        type: 3}
+      propertyPath: sprintMultiplier
+      value: 1.5
+      objectReference: {fileID: 0}
     - target: {fileID: 4273554458893979290, guid: 75a7cf057c0404e4a822958a2c5eeede,
         type: 3}
       propertyPath: m_Enabled

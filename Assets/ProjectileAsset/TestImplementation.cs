@@ -1,15 +1,13 @@
 ﻿using UnityEngine;
 using ProjectileAsset;
-using UnityEngine.UI;
 
 public class TestImplementation : ProjectileController
 {
     public GameObject bulletmarkPrefab;
     private Color color;
 
-    protected override void Awake()
+    private void Start()
     {
-        base.Awake();
         color = new Color32((byte)Random.Range(0, 255), (byte)Random.Range(0, 255), (byte)Random.Range(0, 255), 255);
     }
 
