@@ -31,8 +31,17 @@ namespace ProjectileAsset
         private float _penetration;
         public float Penetration
         {
-            get => _penetration;
+            get => PenetrationEnabled ? _penetration : 0;
             protected set => _penetration = value;
+        }
+
+        [SerializeField]
+        [HideInInspector]
+        private bool _ricochetEnabled;
+        public bool RicochetEnabled
+        {
+            get => _ricochetEnabled;
+            protected set => _ricochetEnabled = value;
         }
 
         [SerializeField]
