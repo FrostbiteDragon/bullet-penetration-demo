@@ -49,7 +49,8 @@ namespace ProjectileAsset
         private float _ricochetAngle = 5;
         public float RicochetAngle
         {
-            get => _ricochetAngle;
+            get => RicochetEnabled ? _ricochetAngle : 0;
+            protected set => _ricochetAngle = value; 
         }
 
         [SerializeField]
@@ -83,8 +84,6 @@ namespace ProjectileAsset
             //projectileStart = new ProjectileStart(transform.position, transform.forward, Time.fixedTime);
             //Instantiate(prefab, transform.position, Quaternion.identity);
             //result = ProjectileNew.CalculateTrajectory(projectileStart, Speed, Penetration, GravityMultiplier, RicochetAngle, LayerMask, new Tuple<Vector3, Vector3>[0]);
-
-            _ricochetAngle = 5f;
         }
 
         protected virtual void FixedUpdate()

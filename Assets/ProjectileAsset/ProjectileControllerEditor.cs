@@ -32,8 +32,7 @@ namespace ProjectileAsset
 
         public override void OnInspectorGUI()
         {
-            DrawDefaultInspector();
-            EditorGUILayout.Space();
+           
 
             serializedObject.Update();
 
@@ -51,7 +50,7 @@ namespace ProjectileAsset
             if (penetrationEnabled.boolValue)
             {
                 EditorGUILayout.BeginHorizontal(new GUIStyle(GUI.skin.box) { padding = new RectOffset(10, 0, 0, 0) });
-                EditorGUILayout.LabelField("Ricochet Angle", new GUIStyle(GUI.skin.label), GUILayout.Width(Mathf.Max(Screen.width * 0.45f - 50, 110)));
+                EditorGUILayout.LabelField("Penetration", new GUIStyle(GUI.skin.label), GUILayout.Width(Mathf.Max(Screen.width * 0.45f - 50, 110)));
                 EditorGUILayout.PropertyField(penetration, GUIContent.none);
                 EditorGUILayout.LabelField("mm", GUILayout.Width(22));
                 EditorGUILayout.EndHorizontal();
@@ -71,6 +70,9 @@ namespace ProjectileAsset
                 EditorGUILayout.LabelField("°", GUILayout.Width(22));
                 EditorGUILayout.EndHorizontal();
             }
+
+            EditorGUILayout.Space();
+            DrawDefaultInspector();
 
             serializedObject.ApplyModifiedProperties();
         }
