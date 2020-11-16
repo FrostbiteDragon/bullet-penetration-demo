@@ -70,11 +70,11 @@ namespace ProjectileAsset
                 EditorGUILayout.LabelField("°", GUILayout.Width(22));
                 EditorGUILayout.EndHorizontal();
             }
+            serializedObject.ApplyModifiedProperties();
 
             EditorGUILayout.Space();
             DrawDefaultInspector();
 
-            serializedObject.ApplyModifiedProperties();
         }
     }
 }

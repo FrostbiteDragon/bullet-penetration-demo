@@ -5,9 +5,6 @@ namespace ProjectileAsset
 {
     public abstract class ProjectileController : MonoBehaviour
     {
-        //DEBUG
-        public GameObject prefab;
-
         [SerializeField]
         [HideInInspector]
         private LayerMask _layerMask;
@@ -28,7 +25,7 @@ namespace ProjectileAsset
 
         [SerializeField]
         [HideInInspector]
-        private float _penetration;
+        private float _penetration = 50;
         public float Penetration
         {
             get => PenetrationEnabled ? _penetration : 0;
@@ -77,19 +74,18 @@ namespace ProjectileAsset
         protected virtual void OnPenetrationFailed(RaycastHit hit, Vector3 velocity) { }
         protected virtual void OnRicochet(float inAngle, Vector3 entryDirection, Vector3 exitDirection, RaycastHit hit) { }
 
-
         private ProjectileResult result;
-        protected virtual void Awake()
+        private Vector3 targetPosition;
+
+        private void Awake()
         {
-            //projectileStart = new ProjectileStart(transform.position, transform.forward, Time.fixedTime);
-            //Instantiate(prefab, transform.position, Quaternion.identity);
-            //result = ProjectileNew.CalculateTrajectory(projectileStart, Speed, Penetration, GravityMultiplier, RicochetAngle, LayerMask, new Tuple<Vector3, Vector3>[0]);
+            targetPosition = transform.position;
         }
 
         protected virtual void FixedUpdate()
         {
             result = ProjectileNew.CalculateTrajectory(
-                transform.position,
+                targetPosition,
                 result?.velocity.normalized ?? transform.forward,
                 result?.velocity.magnitude ?? Speed,
                 Penetration,
@@ -113,7 +109,7 @@ namespace ProjectileAsset
                         break;
                 }
             }
-            transform.position = result.position;
+            targetPosition = result.position;
             Velocity = result.velocity;
         }
     }
