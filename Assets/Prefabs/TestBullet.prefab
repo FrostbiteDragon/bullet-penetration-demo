@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6043145849923807601}
-  - component: {fileID: -384022657140860329}
+  - component: {fileID: 7414393323711674137}
   - component: {fileID: 6306622401768653117}
   - component: {fileID: 9193399784155111521}
   - component: {fileID: -6861844834866886860}
@@ -34,7 +34,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &-384022657140860329
+--- !u!114 &7414393323711674137
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -43,7 +43,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 6043145849923807600}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 64776c7dabbf6324b9e3b39d30c88696, type: 3}
+  m_Script: {fileID: 11500000, guid: c55e1017a98c45e4ebb5634cc7af72ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _gravityMultiplier: 1
@@ -52,16 +52,15 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   _penetrationEnabled: 1
-  _penetration: 60
+  _penetration: 50
   _ricochetEnabled: 1
-  _ricochetAngle: 10
-  _debugEnabled: 1
-  _debugLinesSurviveDestroy: 0
+  _ricochetAngle: 5
+  _debugEnabled: 0
+  _debugLinesSurviveDestroy: 1
   _pathColor: {r: 1, g: 1, b: 1, a: 1}
-  _normalColor: {r: 0.745283, g: 0.48043218, b: 0.024608415, a: 1}
+  _normalColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   _penetrationColor: {r: 1, g: 0, b: 1, a: 1}
-  bulletmarkPrefab: {fileID: 6454624227189403406, guid: d05453ac2bc5df74bb27e5dbd515bb1d,
-    type: 3}
+  bulletmarkPrefab: {fileID: 0}
 --- !u!23 &6306622401768653117
 MeshRenderer:
   m_ObjectHideFlags: 0
