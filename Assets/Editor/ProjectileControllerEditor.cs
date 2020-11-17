@@ -112,6 +112,7 @@ namespace ProjectileAsset
             EditorGUILayout.EndFoldoutHeaderGroup();
 
             serializedObject.ApplyModifiedProperties();
+            DrawDefaultInspector();
         }
     }
 }

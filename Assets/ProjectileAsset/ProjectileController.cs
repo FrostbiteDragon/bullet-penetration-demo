@@ -61,7 +61,7 @@ namespace ProjectileAsset
 
         [SerializeField]
         [HideInInspector]
-        private float _ricochetAngle = 5;
+        private float _ricochetAngle = 15;
         public float RicochetAngle
         {
             get => RicochetEnabled ? _ricochetAngle : 0;
@@ -79,7 +79,7 @@ namespace ProjectileAsset
 
         [SerializeField]
         [HideInInspector]
-        private bool _debugLinesSurviveDestroy = true;
+        private bool _debugLinesSurviveDestroy;
         public bool DebugLinesSurviveDestroy
         {
             get => _debugLinesSurviveDestroy;

@@ -50,17 +50,18 @@ MonoBehaviour:
   _speed: 300
   _layerMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 2048
   _penetrationEnabled: 1
-  _penetration: 50
+  _penetration: 60
   _ricochetEnabled: 1
-  _ricochetAngle: 5
-  _debugEnabled: 0
-  _debugLinesSurviveDestroy: 1
+  _ricochetAngle: 15
+  _debugEnabled: 1
+  _debugLinesSurviveDestroy: 0
   _pathColor: {r: 1, g: 1, b: 1, a: 1}
   _normalColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   _penetrationColor: {r: 1, g: 0, b: 1, a: 1}
-  bulletmarkPrefab: {fileID: 0}
+  bulletmarkPrefab: {fileID: 6454624227189403406, guid: d05453ac2bc5df74bb27e5dbd515bb1d,
+    type: 3}
 --- !u!23 &6306622401768653117
 MeshRenderer:
   m_ObjectHideFlags: 0
