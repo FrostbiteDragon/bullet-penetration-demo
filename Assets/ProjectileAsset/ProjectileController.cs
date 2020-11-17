@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace ProjectileAsset
@@ -7,7 +8,24 @@ namespace ProjectileAsset
     {
         [SerializeField]
         [HideInInspector]
-        private LayerMask _layerMask;
+        private float _gravityMultiplier = 1;
+        public float GravityMultiplier
+        {
+            get => _gravityMultiplier;
+            protected set => _gravityMultiplier = value;
+        }
+
+        [SerializeField]
+        [HideInInspector]
+        private float _speed = 300;
+        public float Speed
+        {
+            get => _speed;
+            protected set => _speed = value;
+        }
+        [SerializeField]
+        [HideInInspector]
+        private LayerMask _layerMask = new LayerMask() {value = -1 };
         public LayerMask LayerMask
         {
             get => _layerMask;
@@ -16,7 +34,7 @@ namespace ProjectileAsset
 
         [SerializeField]
         [HideInInspector]
-        private bool _penetrationEnabled;
+        private bool _penetrationEnabled = true;
         public bool PenetrationEnabled
         {
             get => _penetrationEnabled;
@@ -34,7 +52,7 @@ namespace ProjectileAsset
 
         [SerializeField]
         [HideInInspector]
-        private bool _ricochetEnabled;
+        private bool _ricochetEnabled = true;
         public bool RicochetEnabled
         {
             get => _ricochetEnabled;
@@ -52,19 +70,47 @@ namespace ProjectileAsset
 
         [SerializeField]
         [HideInInspector]
-        private float _gravityMultiplier = 1;
-        public float GravityMultiplier
+        private bool _debugEnabled;
+        public bool DebugEnabled
         {
-            get => _gravityMultiplier;
+            get => Debug.isDebugBuild && _debugEnabled;
+            protected set => _debugEnabled = value;
         }
 
         [SerializeField]
         [HideInInspector]
-        private float _speed = 300;
-        public float Speed
+        private bool _debugLinesSurviveDestroy = true;
+        public bool DebugLinesSurviveDestroy
         {
-            get => _speed;
-            protected set => _speed = value;
+            get => _debugLinesSurviveDestroy;
+            protected set => _debugLinesSurviveDestroy = value;
+        }
+
+        [SerializeField]
+        [HideInInspector]
+        private Color _pathColor = Color.white;
+        public Color PathColor
+        {
+            get => _pathColor;
+            protected set => _pathColor = value;
+        }
+
+        [SerializeField]
+        [HideInInspector]
+        private Color _normalColor = Color.yellow;
+        public Color NormalColor
+        {
+            get => _normalColor;
+            protected set => _normalColor = value;
+        }
+
+        [SerializeField]
+        [HideInInspector]
+        private Color _penetrationColor = Color.magenta;
+        public Color PenetrationColor
+        {
+            get => _penetrationColor;
+            protected set => _penetrationColor = value;
         }
 
         public Vector3 Velocity { get; private set; }
@@ -75,17 +121,13 @@ namespace ProjectileAsset
         protected virtual void OnRicochet(float inAngle, Vector3 entryDirection, Vector3 exitDirection, RaycastHit hit) { }
 
         private ProjectileResult result;
-        private Vector3 targetPosition;
 
-        private void Awake()
-        {
-            targetPosition = transform.position;
-        }
+        private List<DebugLine> debugLines = new List<DebugLine>();
 
         protected virtual void FixedUpdate()
         {
             result = ProjectileNew.CalculateTrajectory(
-                targetPosition,
+                transform.position,
                 result?.velocity.normalized ?? transform.forward,
                 result?.velocity.magnitude ?? Speed,
                 Penetration,
@@ -93,24 +135,77 @@ namespace ProjectileAsset
                 RicochetAngle,
                 LayerMask);
 
-            foreach (var hit in result.results)
+            for (var i = 0; i < result.results.Length; i++)
             {
-                switch (hit)
+                switch (result.results[i])
                 {
                     case HitResult.Ricochet ricochet:
                         OnRicochet(ricochet.angle, ricochet.inVelocity, ricochet.outVelocity, ricochet.hit);
+
+                        if (DebugEnabled)
+                        {
+                            debugLines.Add(new DebugLine(transform.position, ricochet.hit.point, PathColor));
+                            debugLines.Add(new DebugLine(ricochet.hit.point, result.position, PathColor));
+
+                            var distance = 0.1f;
+                            debugLines.Add(
+                                new DebugLine(
+                                    ricochet.hit.point, 
+                                    new Vector3(ricochet.hit.point.x + ricochet.hit.normal.x * distance, ricochet.hit.point.y + ricochet.hit.normal.y * distance, ricochet.hit.point.z + ricochet.hit.normal.z * distance),
+                                    NormalColor)
+                                );
+                        }
                         break;
+
                     case HitResult.Penetration penetration:
                         OnPenetrationEnter(penetration.entry, penetration.velocity, penetration.thickness);
                         OnPenetrationExit(penetration.exit, penetration.velocity);
+                        if (DebugEnabled)
+                        {
+                            if (i == 0)
+                                debugLines.Add(new DebugLine(transform.position, penetration.entry.point, PathColor));
+                            debugLines.Add(new DebugLine(penetration.entry.point, penetration.exit.point, PenetrationColor));
+                            debugLines.Add(new DebugLine(penetration.exit.point, result.position, PathColor));
+                        }
                         break;
+
                     case HitResult.FailedPenetration failedPen:
                         OnPenetrationFailed(failedPen.hit, failedPen.velocity);
+
+                        if (DebugEnabled && i != result.results.Length - 1)
+                            debugLines.Add(new DebugLine(transform.position, failedPen.hit.point, PathColor));
                         break;
                 }
             }
-            targetPosition = result.position;
+
+            if (DebugEnabled && result.results.Length == 0)
+                debugLines.Add(new DebugLine(transform.position, result.position, PathColor));
+
+            transform.position = result.position;
             Velocity = result.velocity;
+        }
+
+        protected virtual void Update()
+        {
+            if (DebugEnabled)
+                RenderLines(debugLines);
+        }
+
+        protected virtual void OnDestroy()
+        {
+            if (DebugEnabled && DebugLinesSurviveDestroy)
+                RenderLines(debugLines, float.PositiveInfinity);
+        }
+
+        private void RenderLines(List<DebugLine> lines)
+        {
+            foreach (var line in lines)
+                line.Render();
+        }
+        private void RenderLines(List<DebugLine> lines, float duration)
+        {
+            foreach (var line in lines)
+                line.Render(duration);
         }
     }
 }

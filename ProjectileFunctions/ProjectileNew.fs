@@ -21,6 +21,7 @@ module ProjectileNew =
         let rec GetResults (startPoint : Vector3) (endPoint : Vector3) distanceLeft projectileResult =
             let mutable contact = RaycastHit()
             let hitObject = Physics.Linecast(startPoint, endPoint, &contact, layerMask)
+            let contact = contact;
 
             let result =
                 match hitObject with
@@ -40,6 +41,7 @@ module ProjectileNew =
                                 contact.point - backCastStartPoint,
                                 Vector3.Distance(contact.point, backCastStartPoint),
                                 layerMask)
+                            |> Array.filter(fun x -> x.collider = contact.collider)
                             |> Array.sortBy(fun x -> x.distance)
                         
                         if hits.Length = 0 then
@@ -50,7 +52,7 @@ module ProjectileNew =
 
                             if thickness < penetration
                                 then Penetration(inDirection * speed, contact, exitHit, thickness)
-                                else FailedPenetration(inDirection * speed, contact, Single.PositiveInfinity)
+                                else FailedPenetration(inDirection * speed, contact, thickness)
 
             match result with
             | Ricochet (_, outVelocity, _, hit) -> 
@@ -89,4 +91,6 @@ module ProjectileNew =
 
         let startPoint = GetPosition position direction 0f
         let endPoint = GetPosition position direction Time.fixedDeltaTime
-        GetResults startPoint endPoint (Vector3.Distance(startPoint, endPoint)) { position = startPoint; velocity = direction * speed; results = [||]; }
+        let projectileResult = GetResults startPoint endPoint (Vector3.Distance(startPoint, endPoint)) { position = startPoint; velocity = direction * speed; results = [||]; }
+        { projectileResult with 
+            results = projectileResult.results |> Array.rev }
